@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <style>
+    @keyframes centrarTitulo {
+      0% {
+        letter-spacing: 2rem;
+        transform: scaleX(2);
+        opacity: 0;
+      }
+      100% {
+        letter-spacing: normal;
+        transform: scaleX(1);
+        opacity: 1;
+      }
+    }
+    #titulo-principal {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 3.5rem;
+      color: #2e7d32;
+      animation: centrarTitulo 1.5s ease-out forwards;
+    }
+  </style>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Catálogo de Plantas con Pokémon</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0fff0;
+    }
+    header {
+      text-align: center;
+      background-color: #cdeecf;
+      padding: 1rem;
+    }
+    .switch-container {
+      text-align: center;
+      margin: 1rem;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #4CAF50;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    h2 {
+      margin-left: 1rem;
+      color: #467a46;
+    }
+    .plantas-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      padding: 0 1rem 2rem;
+    }
+    .planta-card {
+      width: 180px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .planta-card:hover {
+      transform: scale(1.03);
+    }
+    .planta-card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+    }
+    .mini-poke {
+      width: 40px;
+      margin-top: 4px;
+    }
+    #modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #modal-content {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      max-height: 90vh;
+      overflow-y: auto;
+      width: 90%;
+      max-width: 600px;
+      animation: fadeIn 0.3s ease-out;
+    }
+    #modal img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+    #cerrar-modal {
+      float: right;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  
+<header style="text-align:center; padding: 2rem 1rem;">
+  <h1 id="titulo-principal">Verde VIVO!!</h1>
+  <p style="font-size:1.2rem; max-width: 800px; margin: 1rem auto; color:#2e7d32;">
+    🌿 <strong>Explora el mundo vegetal... ¡y descubre qué Pokémon pudo nacer de una flor!</strong>
+  </p>
+  <p style="text-align: justify; max-width: 850px; margin: 1rem auto; font-size: 1rem; color:#4b604b;">
+    Este sitio busca sensibilizar y educar sobre la biodiversidad vegetal, mostrando la conexión entre la naturaleza y la cultura popular. A través de un catálogo visual, dinámico y lúdico,
+    se presentan diversas especies de plantas clasificadas por su región, familia y tipo ecológico, así como curiosidades relacionadas con su uso, su valor ambiental y su posible influencia
+    en el diseño de Pokémon. Esta herramienta sirve como puente entre la ciencia y el entretenimiento, fomentando el conocimiento ecológico de manera accesible y atractiva para todas las edades.
+  </p>
+</header>
+
+
+  <div class="switch-container">
+    <label>Mostrar solo plantas con Pokémon:</label>
+    <label class="switch">
+      <input type="checkbox" id="pokemonSwitch" onchange="renderPlantas()">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div id="plantas-contenedor-principal"></div>
+
+  <div id="modal">
+    <div id="modal-content">
+      <span id="cerrar-modal">&times;</span>
+      <div id="modal-content-body"></div>
+    </div>
+  </div>
+
+  <script>
+    const plantasData = [{"Nombre común": "Jungle Geranium", "Nombre científico": "Ixora coccinea", "Región originaria": "Asia tropical", "Especie": "coccinea", "Clasificación (Familia)": "Rubiaceae", "Archivo": "andronicus-enoch-muwanguzi-26_2MvmahJc-unsplash.jpg", "Adaptación al medio": "Tropical (requiere humedad y sol)", "Curiosidades": "Usada en rituales religiosos en India. Su floración constante atrae polinizadores.", "Imagen Pokémon": "", "Continente": "Asia", "Categoría": "Plantas selváticas", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Frangipani Blanca", "Nombre científico": "Plumeria alba", "Región originaria": "Región del Caribe tropical", "Especie": "alba", "Clasificación (Familia)": "Apocynaceae", "Archivo": "alexey-demidov-7fjdRp9UW-0-unsplash.jpg", "Adaptación al medio": "Tropical (resiste sequías, clima cálido)", "Curiosidades": "Flor ceremonial en Hawai y rituales hindúes. Inspiró a algunos Pokémon tipo planta.", "Imagen Pokémon": "", "Continente": "América", "Categoría": "Plantas selváticas", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Planta de Café", "Nombre científico": "Coffea arabica", "Región originaria": "Etiopía (Abisinia)", "Especie": "arabica", "Clasificación (Familia)": "Rubiaceae", "Archivo": "alex-nunes-Z1XwAmcaEYU-unsplash.jpg", "Adaptación al medio": "Tropical húmedo de sombra parcial", "Curiosidades": "Sombra ideal para fauna tropical; mantiene biodiversidad en cafetales.", "Imagen Pokémon": "", "Continente": "África", "Categoría": "Plantas selváticas", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Planta ornamental de invernadero", "Nombre científico": "Desconocido", "Región originaria": "Probablemente tropical", "Especie": "Desconocida", "Clasificación (Familia)": "Planta tropical de interior", "Archivo": "alwin-fernandis-R55PfuB2hDw-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Sin Definir", "Categoría": "Plantas de interior", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Powderpuff Blanca", "Nombre científico": "Calliandra haematocephala 'Alba'", "Región originaria": "América tropical", "Especie": "haematocephala", "Clasificación (Familia)": "Fabaceae", "Archivo": "angele-kamp-aCg8EkBNWJ8-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "América", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Coleus", "Nombre científico": "Plectranthus scutellarioides", "Región originaria": "Regiones tropicales de Asia", "Especie": "scutellarioides", "Clasificación (Familia)": "Lamiaceae", "Archivo": "annie-spratt-6rstDi9VHZE-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/152.png", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "Chikorita", "Número Pokémon": 152}, {"Nombre común": "Plantas de Invernadero (varias)", "Nombre científico": "Varias especies", "Región originaria": "Diversa", "Especie": "Varias", "Clasificación (Familia)": "Varias", "Archivo": "annie-spratt-oLJdwVxD05Y-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Sin Definir", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Hortensia", "Nombre científico": "Hydrangea macrophylla", "Región originaria": "Japón", "Especie": "macrophylla", "Clasificación (Familia)": "Hydrangeaceae", "Archivo": "annie-spratt-Pudcm37H6gY-unsplash.jpg", "Adaptación al medio": "Templada húmeda", "Curiosidades": "Usada como planta ornamental simbólica de gratitud en Asia.", "Imagen Pokémon": "", "Continente": "Asia", "Categoría": "Plantas ornamentales", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Ave del Paraíso", "Nombre científico": "Strelitzia reginae", "Región originaria": "Sudáfrica", "Especie": "reginae", "Clasificación (Familia)": "Strelitziaceae", "Archivo": "annie-spratt-VxcpqEe3DEE-unsplash.jpg", "Adaptación al medio": "Tropical/semiárida (alta resistencia)", "Curiosidades": "Atrae aves polinizadoras como el sunbird en África.", "Imagen Pokémon": "", "Continente": "África", "Categoría": "Plantas selváticas", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Jazmín de Vela", "Nombre científico": "Tabernaemontana divaricata", "Región originaria": "Asia tropical", "Especie": "divaricata", "Clasificación (Familia)": "Apocynaceae", "Archivo": "anutosh-satpute-__CvVZJhkko-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Pentasma Estrella", "Nombre científico": "Pentas lanceolata", "Región originaria": "África tropical", "Especie": "lanceolata", "Clasificación (Familia)": "Rubiaceae", "Archivo": "ar-sh-mohammed-YPr5MkhfaaQ-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "África", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Trompeta de Ángel", "Nombre científico": "Brugmansia aurea", "Región originaria": "Andes de Sudamérica", "Especie": "aurea", "Clasificación (Familia)": "Solanaceae", "Archivo": "ben-kupke-DlXEY6qJ8kQ-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "América", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Filodendro de Hojas de Corazón", "Nombre científico": "Philodendron hederaceum", "Región originaria": "América tropical", "Especie": "hederaceum", "Clasificación (Familia)": "Araceae", "Archivo": "bernd-dittrich-CeBA_bH9jR0-unsplash.jpg", "Adaptación al medio": "Tropical húmedo (trepadora)", "Curiosidades": "Purifica el aire en interiores; muy común en decoración tropical.", "Imagen Pokémon": "", "Continente": "América", "Categoría": "Plantas selváticas", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Arce (Samaras)", "Nombre científico": "Acer pseudoplatanus", "Región originaria": "Europa y Asia Occidental", "Especie": "pseudoplatanus", "Clasificación (Familia)": "Sapindaceae", "Archivo": "biljana-tosovic--ZkZNRShutU-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/470.png", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "Leafeon", "Número Pokémon": 470}, {"Nombre común": "Clemátide Silvestre", "Nombre científico": "Clematis vitalba", "Región originaria": "Europa y noroeste de África", "Especie": "vitalba", "Clasificación (Familia)": "Ranunculaceae", "Archivo": "boston-public-library-oxHPWXgdTIA-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "África", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Palma Cica (Sagú)", "Nombre científico": "Cycas revoluta", "Región originaria": "Japón", "Especie": "revoluta", "Clasificación (Familia)": "Cycadaceae", "Archivo": "bradrey-nassel-h3b-16Rl0-s-unsplash.jpg", "Adaptación al medio": "Subtropical/semiárida", "Curiosidades": "Planta antigua; símbolo de longevidad en jardinería oriental.", "Imagen Pokémon": "", "Continente": "Asia", "Categoría": "Plantas selváticas", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Lirio de Madonna", "Nombre científico": "Lilium candidum", "Región originaria": "Mediterráneo Oriental", "Especie": "candidum", "Clasificación (Familia)": "Liliaceae", "Archivo": "british-library-HVvXTQVHCV0-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Plátano", "Nombre científico": "Musa paradisiaca", "Región originaria": "Sudeste Asiático", "Especie": "paradisiaca", "Clasificación (Familia)": "Musaceae", "Archivo": "bryan-dijkhuizen-afCYU_ti5QU-unsplash.jpg", "Adaptación al medio": "Tropical húmedo, sombra parcial", "Curiosidades": "Símbolo de fertilidad en culturas del Sudeste Asiático. Usada en rituales.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/357.png", "Continente": "Sin Definir", "Categoría": "Plantas selváticas", "Nombre Pokémon": "Tropius", "Número Pokémon": 357}, {"Nombre común": "Loto Sagrado", "Nombre científico": "Nelumbo nucifera", "Región originaria": "Asia", "Especie": "nucifera", "Clasificación (Familia)": "Nelumbonaceae", "Archivo": "buddha-elemental-M8ag-FC7VEk-unsplash.jpg", "Adaptación al medio": "Acuática (raíces sumergidas)", "Curiosidades": "Flor sagrada en el hinduismo y budismo; representa la pureza.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/270.png", "Continente": "Asia", "Categoría": "Plantas acuáticas", "Nombre Pokémon": "Lotad", "Número Pokémon": 270}, {"Nombre común": "Orquídea Morada", "Nombre científico": "Eulophia graminea", "Región originaria": "África y Asia tropical", "Especie": "graminea", "Clasificación (Familia)": "Orchidaceae", "Archivo": "caro-k-hoolmAr5S8Y-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "África", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Palmera enana", "Nombre científico": "Chamaedorea elegans", "Región originaria": "Bosques templados de México", "Especie": "elegans", "Clasificación (Familia)": "Arecaceae", "Archivo": "catherine-zaidova-qjtD9y83jxo-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "América", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Suculenta Cola de Gato", "Nombre científico": "Echeveria runyonii", "Región originaria": "México", "Especie": "runyonii", "Clasificación (Familia)": "Crassulaceae", "Archivo": "cayce-wegman-gCRyr130E3s-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/830.png", "Continente": "América", "Categoría": "Suculentas", "Nombre Pokémon": "Eldegoss", "Número Pokémon": 830}, {"Nombre común": "Lirio de Agua", "Nombre científico": "Nymphaea caerulea", "Región originaria": "África", "Especie": "caerulea", "Clasificación (Familia)": "Nymphaeaceae", "Archivo": "clark-van-der-beken-QSbvSq_sCVs-unsplash.jpg", "Adaptación al medio": "Acuática tropical", "Curiosidades": "Usada en el antiguo Egipto en rituales; asociada con el renacimiento.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/270.png", "Continente": "África", "Categoría": "Plantas selváticas", "Nombre Pokémon": "Lotad", "Número Pokémon": 270}, {"Nombre común": "Hibisco Rojo", "Nombre científico": "Hibiscus rosa-sinensis", "Región originaria": "Asia Tropical", "Especie": "rosa-sinensis", "Clasificación (Familia)": "Malvaceae", "Archivo": "desi-gretaa-ItfhiCBH7_Y-unsplash.jpg", "Adaptación al medio": "Tropical (alta resistencia)", "Curiosidades": "Flor nacional de Malasia. Usada como ofrenda y medicina tradicional.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/192.png", "Continente": "Asia", "Categoría": "Plantas selváticas", "Nombre Pokémon": "Sunflora", "Número Pokémon": 192}, {"Nombre común": "Espino albar", "Nombre científico": "Crataegus monogyna", "Región originaria": "Europa, Oeste de Asia", "Especie": "monogyna", "Clasificación (Familia)": "Rosaceae", "Archivo": "europeana-wny2HAyG8Fo-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/708.png", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "Phantump", "Número Pokémon": 708}, {"Nombre común": "Eucalipto", "Nombre científico": "Eucalyptus globulus", "Región originaria": "Australia", "Especie": "globulus", "Clasificación (Familia)": "Myrtaceae", "Archivo": "evie-s-5aXgxbySO5o-unsplash.jpg", "Adaptación al medio": "Templado seco (adaptación a incendios)", "Curiosidades": "Soporta incendios y regenera rápido; vital para koalas.", "Imagen Pokémon": "", "Continente": "Oceanía", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Tuna", "Nombre científico": "Opuntia ficus-indica", "Región originaria": "México", "Especie": "ficus-indica", "Clasificación (Familia)": "Cactaceae", "Archivo": "francesco-ungaro-UH-BcyA_qNk-unsplash.jpg", "Adaptación al medio": "Desértica (adaptación a aridez)", "Curiosidades": "Importante para el ecosistema árido; fuente de alimento para fauna.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/556.png", "Continente": "América", "Categoría": "Plantas desérticas", "Nombre Pokémon": "Maractus", "Número Pokémon": 556}, {"Nombre común": "Rosa", "Nombre científico": "Rosa chinensis", "Región originaria": "Asia", "Especie": "chinensis", "Clasificación (Familia)": "Rosaceae", "Archivo": "francine-heredero-XsQvD4dgSG0-unsplash.jpg", "Adaptación al medio": "Templada adaptable", "Curiosidades": "Asociada con el amor y belleza; presente en festividades.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/315.png", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "Roselia", "Número Pokémon": 315}, {"Nombre común": "Trompeta de ángel", "Nombre científico": "Brugmansia suaveolens", "Región originaria": "Sudamérica", "Especie": "suaveolens", "Clasificación (Familia)": "Solanaceae", "Archivo": "frank-ching-CACuQQZTcE4-unsplash.jpg", "Adaptación al medio": "Tropical montañoso", "Curiosidades": "Usada en rituales chamánicos en los Andes. Planta tóxica.", "Imagen Pokémon": "", "Continente": "América", "Categoría": "Plantas selváticas", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Monstera", "Nombre científico": "Monstera deliciosa", "Región originaria": "México y Centroamérica", "Especie": "deliciosa", "Clasificación (Familia)": "Araceae", "Archivo": "gilles-lambert-mSK5nNsAsLY-unsplash.jpg", "Adaptación al medio": "Tropical selvática (trepadora)", "Curiosidades": "Trepadora de sombra; usada como decoración en interiores. Inspiración visual para Pokémon como Tropius.", "Imagen Pokémon": "", "Continente": "América", "Categoría": "Plantas selváticas", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Ñame", "Nombre científico": "Dioscorea alata", "Región originaria": "Asia tropical", "Especie": "alata", "Clasificación (Familia)": "Dioscoreaceae", "Archivo": "hardingferrent-fBDyJ0OUu7I-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Cola de gato", "Nombre científico": "Orthosiphon aristatus", "Región originaria": "Asia tropical", "Especie": "aristatus", "Clasificación (Familia)": "Lamiaceae", "Archivo": "ilham-abitama-KpX2furar-g-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Plum blossom", "Nombre científico": "Prunus domestica", "Región originaria": "Europe and Caucasus", "Especie": "Prunus domestica", "Clasificación (Familia)": "Rosaceae", "Archivo": "jamaleddin-toomajnia-SgqkLsHZ4ZE-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Sin Definir", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Helecho común", "Nombre científico": "Pteridium aquilinum", "Región originaria": "Cosmopolitan (temperate regions)", "Especie": "Pteridium aquilinum", "Clasificación (Familia)": "Dennstaedtiaceae", "Archivo": "matt-richmond-QKExHYkKQ5I-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Sin Definir", "Categoría": "Helechos", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Common teasel", "Nombre científico": "Dipsacus fullonum", "Región originaria": "Europe and Western Asia", "Especie": "Dipsacus fullonum", "Clasificación (Familia)": "Caprifoliaceae", "Archivo": "jonathan-borba-bUXad2FH878-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Lantana", "Nombre científico": "Lantana camara", "Región originaria": "Tropical Americas", "Especie": "Lantana camara", "Clasificación (Familia)": "Verbenaceae", "Archivo": "k8-F8y3bVsUyTg-unsplash.jpg", "Adaptación al medio": "Tropical/semiárida (invasiva)", "Curiosidades": "Atrae mariposas; usada en jardinería por su colorido.", "Imagen Pokémon": "", "Continente": "Sin Definir", "Categoría": "Plantas selváticas", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Yellow skunk cabbage", "Nombre científico": "Lysichiton americanus", "Región originaria": "Western North America", "Especie": "Lysichiton americanus", "Clasificación (Familia)": "Araceae", "Archivo": "kayvan-mazhar-RUbml2jli2E-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Sin Definir", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Night-blooming jasmine", "Nombre científico": "Cestrum nocturnum", "Región originaria": "West Indies", "Especie": "Cestrum nocturnum", "Clasificación (Familia)": "Solanaceae", "Archivo": "keran-yang-NTkoEUUC1rw-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Sin Definir", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Banana", "Nombre científico": "Musa × paradisiaca", "Región originaria": "Southeast Asia", "Especie": "Musa × paradisiaca", "Clasificación (Familia)": "Musaceae", "Archivo": "keszthelyi-timi-Zi3_8fqe7Us-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Bougainvillea", "Nombre científico": "Bougainvillea glabra", "Región originaria": "Brazil", "Especie": "Bougainvillea glabra", "Clasificación (Familia)": "Nyctaginaceae", "Archivo": "krithika-nandakumar-oGTWOhuqRqc-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Sin Definir", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Jambolao rosa", "Nombre científico": "Syzygium jambos", "Región originaria": "Malasia–Sumatra", "Especie": "jambos", "Clasificación (Familia)": "Myrtaceae", "Archivo": "lilik-eka-bjglJ415sHU-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/315.png", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "Roselia", "Número Pokémon": 315}, {"Nombre común": "Banano (Plátano)", "Nombre científico": "Musa spp.", "Región originaria": "Sureste de Asia", "Especie": "Musa", "Clasificación (Familia)": "Musaceae", "Archivo": "liza-pooor-lU8GO031kbQ-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/357.png", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "Tropius", "Número Pokémon": 357}, {"Nombre común": "Jacarandá", "Nombre científico": "Jacaranda mimosifolia", "Región originaria": "Sudamérica (Brasil–Bolivia)", "Especie": "mimosifolia", "Clasificación (Familia)": "Bignoniaceae", "Archivo": "lovestark-tmjKLRSK9po-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/754.png", "Continente": "América", "Categoría": "Sin Definir", "Nombre Pokémon": "Lurantis", "Número Pokémon": 754}, {"Nombre común": "Reloj de Mysore", "Nombre científico": "Thunbergia mysorensis", "Región originaria": "India (Mysore)", "Especie": "mysorensis", "Clasificación (Familia)": "Acanthaceae", "Archivo": "luke-galloway-twyc9tRsWOI-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Sedum Jelly Bean", "Nombre científico": "Sedum rubrotinctum", "Región originaria": "México–Centroamérica", "Especie": "rubrotinctum", "Clasificación (Familia)": "Crassulaceae", "Archivo": "manon-lince-JUx4sznn0x8-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "América", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Balsamina", "Nombre científico": "Impatiens balsamina", "Región originaria": "Sur de Asia", "Especie": "balsamina", "Clasificación (Familia)": "Balsaminaceae", "Archivo": "majo-de-la-guardia-_6mI3G_UtTY-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Arum italiano", "Nombre científico": "Arum italicum", "Región originaria": "Mediterráneo", "Especie": "italicum", "Clasificación (Familia)": "Araceae", "Archivo": "maria-fro-8uvrUl4nF18-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Hibisco farol japonés", "Nombre científico": "Hibiscus schizopetalus", "Región originaria": "África oriental", "Especie": "schizopetalus", "Clasificación (Familia)": "Malvaceae", "Archivo": "mario-mendez-2_PdajJ8QuI-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "África", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Lobster claw", "Nombre científico": "Heliconia rostrata", "Región originaria": "Andes (Perú y Ecuador)", "Especie": "rostrata", "Clasificación (Familia)": "Planta herbácea tropical (Familia Heliconiaceae)", "Archivo": "max-letek-m1OHjSWqt-0-unsplash.jpg", "Adaptación al medio": "Tropical lluvioso", "Curiosidades": "Vital para colibríes; sus flores son refugio y fuente de néctar.", "Imagen Pokémon": "", "Continente": "América", "Categoría": "Plantas selváticas", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Photinia rojo", "Nombre científico": "Photinia × fraseri", "Región originaria": "Este de Asia (China)", "Especie": "× fraseri", "Clasificación (Familia)": "Arbusto ornamental perenne (Familia Rosaceae)", "Archivo": "md-jahid-hossen-KDVhvkJ6zZA-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Asia", "Categoría": "Plantas de interior", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Reina de los prados", "Nombre científico": "Filipendula ulmaria", "Región originaria": "Europa", "Especie": "ulmaria", "Clasificación (Familia)": "Planta herbácea perenne de humedales (Familia Rosaceae)", "Archivo": "museum-of-new-zealand-te-papa-tongarewa-9NK5mh3A1wM-unsplash.jpg", "Adaptación al medio": "Desconocida", "Curiosidades": "Información cultural, ecológica o simbólica no registrada.", "Imagen Pokémon": "", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": ""}, {"Nombre común": "Corona imperial", "Nombre científico": "Fritillaria imperialis", "Región originaria": "Asia occidental", "Especie": "Fritillaria", "Clasificación": "Liliaceae", "Archivo": "the-new-york-public-library-TgD2CKnKkeM-unsplash.jpg", "Adaptación al medio": "Tropical", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-TgD2CKnKkeM-unsplash.jpg"}, {"Nombre común": "Toronjil azul", "Nombre científico": "Teucrium fruticans", "Región originaria": "Mediterráneo", "Especie": "Teucrium", "Clasificación": "Lamiaceae", "Archivo": "the-new-york-public-library-TUNYNNQUXHQ-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-TUNYNNQUXHQ-unsplash.jpg"}, {"Nombre común": "Jacinto de los campos", "Nombre científico": "Hyacinthoides non-scripta", "Región originaria": "Europa occidental", "Especie": "Hyacinthoides", "Clasificación": "Asparagaceae", "Archivo": "the-new-york-public-library-uD0QXoT7TFc-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-uD0QXoT7TFc-unsplash.jpg"}, {"Nombre común": "Salvia común", "Nombre científico": "Salvia officinalis", "Región originaria": "Mediterráneo", "Especie": "Salvia", "Clasificación": "Lamiaceae", "Archivo": "the-new-york-public-library-uHeM4_pgkTw-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Europa", "Categoría": "Plantas medicinales", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-uHeM4_pgkTw-unsplash.jpg"}, {"Nombre común": "Cardamomo", "Nombre científico": "Elettaria cardamomum", "Región originaria": "India y Sri Lanka", "Especie": "Elettaria", "Clasificación": "Zingiberaceae", "Archivo": "the-new-york-public-library-uJIC_XqmBu4-unsplash.jpg", "Adaptación al medio": "Tropical", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Sin Definir", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-uJIC_XqmBu4-unsplash.jpg"}, {"Nombre común": "Rosa silvestre rosa", "Nombre científico": "Rosa gallica", "Región originaria": "Europa central y del sur", "Especie": "Rosa", "Clasificación": "Rosaceae", "Archivo": "the-new-york-public-library-Uyu_PNJ6Q6w-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-Uyu_PNJ6Q6w-unsplash.jpg"}, {"Nombre común": "Lavanda", "Nombre científico": "Lavandula angustifolia", "Región originaria": "Mediterráneo", "Especie": "Lavandula", "Clasificación": "Lamiaceae", "Archivo": "the-new-york-public-library-w8lS7s9HZjk-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-w8lS7s9HZjk-unsplash.jpg"}, {"Nombre común": "Narciso", "Nombre científico": "Narcissus pseudonarcissus", "Región originaria": "Europa occidental", "Especie": "Narcissus", "Clasificación": "Amaryllidaceae", "Archivo": "the-new-york-public-library-xYDyhJoI21g-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-xYDyhJoI21g-unsplash.jpg"}, {"Nombre común": "Laurel", "Nombre científico": "Laurus nobilis", "Región originaria": "Mediterráneo", "Especie": "Laurus", "Clasificación": "Lauraceae", "Archivo": "the-new-york-public-library-y17ifGkf5eY-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-y17ifGkf5eY-unsplash.jpg"}, {"Nombre común": "Sagitaria", "Nombre científico": "Sagittaria latifolia", "Región originaria": "América del Norte", "Especie": "Sagittaria", "Clasificación": "Alismataceae", "Archivo": "the-new-york-public-library-ydIF8o_z6WM-unsplash.jpg", "Adaptación al medio": "Tropical", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Sin Definir", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-ydIF8o_z6WM-unsplash.jpg"}, {"Nombre común": "Azafrán", "Nombre científico": "Crocus sativus", "Región originaria": "Región Mediterránea", "Especie": "Crocus sativus", "Clasificación": "Liliopsida", "Archivo": "the-new-york-public-library-NPS5Lf2ec_0-unsplash.jpg", "Adaptación al medio": "Tropical", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Sin Definir", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-NPS5Lf2ec_0-unsplash.jpg"}, {"Nombre común": "Menta", "Nombre científico": "Mentha spicata", "Región originaria": "Europa y Asia", "Especie": "Mentha spicata", "Clasificación": "Magnoliopsida", "Archivo": "the-new-york-public-library--outYbLhEAU-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library--outYbLhEAU-unsplash.jpg"}, {"Nombre común": "Rosa Blanca", "Nombre científico": "Rosa alba", "Región originaria": "Europa Central", "Especie": "Rosa alba", "Clasificación": "Magnoliopsida", "Archivo": "the-new-york-public-library-pNRK1EKCX48-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-pNRK1EKCX48-unsplash.jpg"}, {"Nombre común": "Rosa Damascena", "Nombre científico": "Rosa damascena", "Región originaria": "Oriente Medio", "Especie": "Rosa damascena", "Clasificación": "Magnoliopsida", "Archivo": "the-new-york-public-library-qWYTFpgaj3M-unsplash.jpg", "Adaptación al medio": "Tropical", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Sin Definir", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-qWYTFpgaj3M-unsplash.jpg"}, {"Nombre común": "Ajo Silvestre", "Nombre científico": "Allium ampeloprasum", "Región originaria": "Europa y Asia Occidental", "Especie": "Allium ampeloprasum", "Clasificación": "Liliopsida", "Archivo": "the-new-york-public-library-r1-ulvMI1i8-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-r1-ulvMI1i8-unsplash.jpg"}, {"Nombre común": "Disporum", "Nombre científico": "Disporum cantoniense", "Región originaria": "Asia Oriental", "Especie": "Disporum cantoniense", "Clasificación": "Liliopsida", "Archivo": "the-new-york-public-library-r2fxBRj27IM-unsplash.jpg", "Adaptación al medio": "Tropical", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-r2fxBRj27IM-unsplash.jpg"}, {"Nombre común": "Perejil", "Nombre científico": "Petroselinum crispum", "Región originaria": "Región del Mediterráneo Central", "Especie": "Petroselinum crispum", "Clasificación": "Magnoliopsida", "Archivo": "the-new-york-public-library-sB3NwI69FDc-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-sB3NwI69FDc-unsplash.jpg"}, {"Nombre común": "Estragón", "Nombre científico": "Artemisia dracunculus", "Región originaria": "Asia Central", "Especie": "Artemisia dracunculus", "Clasificación": "Magnoliopsida", "Archivo": "the-new-york-public-library-smHkAiuaudE-unsplash.jpg", "Adaptación al medio": "Tropical", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-smHkAiuaudE-unsplash.jpg"}, {"Nombre común": "Magnolia", "Nombre científico": "Magnolia grandiflora", "Región originaria": "Sureste de Estados Unidos", "Especie": "Magnolia grandiflora", "Clasificación": "Magnoliopsida", "Archivo": "the-new-york-public-library-Su0cjc8J98A-unsplash.jpg", "Adaptación al medio": "Tropical", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Sin Definir", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-Su0cjc8J98A-unsplash.jpg"}, {"Nombre común": "Orégano", "Nombre científico": "Origanum vulgare", "Región originaria": "Europa, Asia templada y regiones del Mediterráneo", "Especie": "Origanum vulgare", "Clasificación": "Magnoliopsida", "Archivo": "the-new-york-public-library-T0J6n2_qM3Q-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-T0J6n2_qM3Q-unsplash.jpg"}, {"Nombre común": "Cilantro", "Nombre científico": "Coriandrum sativum", "Región originaria": "Regiones del sur de Europa, norte de África y Asia occidental", "Especie": "Coriandrum sativum", "Clasificación": "Apiaceae", "Archivo": "the-new-york-public-library-fOdEV4vmoF8-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-fOdEV4vmoF8-unsplash.jpg"}, {"Nombre común": "Lirio Azul", "Nombre científico": "Iris germanica", "Región originaria": "Europa meridional", "Especie": "Iris germanica", "Clasificación": "Iridaceae", "Archivo": "the-new-york-public-library-GN1egtoU6WU-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Europa", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-GN1egtoU6WU-unsplash.jpg"}, {"Nombre común": "Rosa Silvestre", "Nombre científico": "Rosa canina", "Región originaria": "Europa, noroeste de África y Asia occidental", "Especie": "Rosa canina", "Clasificación": "Rosaceae", "Archivo": "the-new-york-public-library-iAWFlPFzV8M-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-iAWFlPFzV8M-unsplash.jpg"}, {"Nombre común": "Geranio", "Nombre científico": "Pelargonium graveolens", "Región originaria": "Sudáfrica", "Especie": "Pelargonium graveolens", "Clasificación": "Geraniaceae", "Archivo": "the-new-york-public-library-NjyzD2ZmkTk-unsplash.jpg", "Adaptación al medio": "Tropical", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Sin Definir", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-NjyzD2ZmkTk-unsplash.jpg"}, {"Nombre común": "Crocus", "Nombre científico": "Crocus sativus", "Región originaria": "Sudeste de Europa y Asia Occidental", "Especie": "Crocus sativus", "Clasificación": "Iridaceae", "Archivo": "the-new-york-public-library-IjFz-e6sMYg-unsplash.jpg", "Adaptación al medio": "Templada", "Curiosidades": "Utilizada en medicina tradicional o como planta ornamental.", "Continente": "Asia", "Categoría": "Sin Definir", "Nombre Pokémon": "", "Número Pokémon": "", "Imagen Pokémon": "", "Ruta Imagen Planta": "./imagenes/the-new-york-public-library-IjFz-e6sMYg-unsplash.jpg"}];
+    
+function abrirModal(planta) {
+  const modal = document.getElementById("modal");
+  const contenido = document.getElementById("modal-content-body");
+  let html = `<img src="./imagenes/${planta['Archivo']}" alt="${planta['Nombre común']}" style="width:100%;max-height:250px;object-fit:cover;border-radius:10px;margin-bottom:1rem;">`;
+  for (const [clave, valor] of Object.entries(planta)) {
+    if (clave !== "Archivo" && clave !== "Imagen Pokémon") {
+      html += `<p><strong>${clave}:</strong> ${valor}</p>`;
+    }
+  }
+  if (planta["Imagen Pokémon"]) {
+    html += `<p><strong>Pokémon relacionado:</strong><br><img src="${planta['Imagen Pokémon']}" alt="${planta['Nombre Pokémon']}" style="width:80px;"></p>`;
+  }
+  contenido.innerHTML = html;
+  modal.style.display = "flex";
+}
+
+
+    function renderPlantas() {
+      const soloPokemon = document.getElementById("pokemonSwitch").checked;
+      const contenedorPrincipal = document.getElementById("plantas-contenedor-principal");
+      contenedorPrincipal.innerHTML = "";
+
+      const continentes = [...new Set(plantasData.map(p => p["Continente"]))].sort();
+
+      continentes.forEach(cont => {
+        const section = document.createElement("section");
+        const h2 = document.createElement("h2");
+        h2.textContent = cont;
+        section.appendChild(h2);
+
+        const grid = document.createElement("div");
+        grid.className = "plantas-container";
+
+        plantasData
+          .filter(p => p["Continente"] === cont && (!soloPokemon || p["Nombre Pokémon"]))
+          .forEach(planta => {
+            const card = document.createElement("div");
+            card.className = "planta-card";
+            card.innerHTML = `
+              <img src="./imagenes/${planta['Archivo']}" alt="${planta['Nombre común']}" />
+              <h4>${planta['Nombre común']}</h4>
+              ${planta['Imagen Pokémon'] ? `<img src="${planta['Imagen Pokémon']}" alt="pokemon" class="mini-poke">` : ''}
+            `;
+            card.onclick = () => abrirModal(planta);
+            grid.appendChild(card);
+          });
+
+        section.appendChild(grid);
+        contenedorPrincipal.appendChild(section);
+      });
+    }
+
+    document.getElementById("cerrar-modal").onclick = () => {
+      document.getElementById("modal").style.display = "none";
+    };
+
+    window.onclick = (e) => {
+      if (e.target === document.getElementById("modal")) {
+        document.getElementById("modal").style.display = "none";
+      }
+    };
+
+    renderPlantas();
+  </script>
+</body>
+</html>
